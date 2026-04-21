@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateProgramRequest extends FormRequest
 {
@@ -22,10 +23,28 @@ class UpdateProgramRequest extends FormRequest
      */
     public function rules(): array
     {
+        $program = $this->route('program');
+        $programId = $program?->getKey();
+
         return [
-            'code' => ['required', 'string', 'max:20'],
+            'code' => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('program', 'code')->ignore($programId, 'program_id'),
+            ],
             'title' => ['required', 'string', 'max:200'],
             'years' => ['required', 'numeric', 'min:1', 'max:6'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'code.unique' => 'Program code already exists.',
         ];
     }
 }

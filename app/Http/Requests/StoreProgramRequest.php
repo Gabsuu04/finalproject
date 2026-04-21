@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreProgramRequest extends FormRequest
 {
@@ -23,9 +24,19 @@ class StoreProgramRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'code' => ['required', 'string', 'max:20'],
+            'code' => ['required', 'string', 'max:20', Rule::unique('program', 'code')],
             'title' => ['required', 'string', 'max:200'],
             'years' => ['required', 'numeric', 'min:1', 'max:6'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'code.unique' => 'Program code already exists.',
         ];
     }
 }

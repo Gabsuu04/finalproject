@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateSubjectRequest extends FormRequest
 {
@@ -22,10 +23,28 @@ class UpdateSubjectRequest extends FormRequest
      */
     public function rules(): array
     {
+        $subject = $this->route('subject');
+        $subjectId = $subject?->getKey();
+
         return [
-            'code' => ['required', 'string', 'max:20'],
+            'code' => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('subject', 'code')->ignore($subjectId, 'subject_id'),
+            ],
             'title' => ['required', 'string', 'max:200'],
             'unit' => ['required', 'numeric', 'min:1'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'code.unique' => 'Subject code already exists.',
         ];
     }
 }
